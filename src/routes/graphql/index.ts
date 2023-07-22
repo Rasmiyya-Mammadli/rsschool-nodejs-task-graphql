@@ -2,6 +2,7 @@ import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
 import { buildSchema } from 'graphql';
 import { graphql, GraphQLResolveInfo } from 'graphql';
+import depthLimit from 'graphql-depth-limit'; 
 import { UUIDType } from './types/uuid.js';
 
 // Sample data (you can replace this with your database or data source)
@@ -19,8 +20,8 @@ const resolvers = {
   },
   Mutation: {
     createUser: (args: { name: string; email: string }) => {
-      // For simplicity, generate a random UUID for the user ID (you can use a UUID library in your project)
-      const userId = 'SAMPLE_USER_ID'; // Replace this with a UUID library call
+      // Generate a random UUID for the user ID using the UUIDType
+      const userId = UUIDType.serialize(generateRandomUUID());
       const newUser: User = {
         id: userId,
         name: args.name,
@@ -32,6 +33,13 @@ const resolvers = {
   },
 };
 
+
+const generateRandomUUID = (): string => {
+  // Implement your logic here to generate a random UUID.
+  // For simplicity, you can use a library or a custom function to generate the UUID.
+  // Replace this with your actual implementation to generate random UUIDs.
+  return 'SAMPLE_RANDOM_UUID';
+};
 // Your custom GraphQL schema
 const gqlSchema = `
   type Query {
@@ -72,7 +80,8 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         undefined,
         undefined,
         (info: GraphQLResolveInfo) => {
-       
+          // Step 2: Use depthLimit as a validation rule to limit query complexity
+          return { validationRules: [depthLimit(5)] };
         }
       );
       return { ...result };
