@@ -9,5 +9,5 @@
     "moduleResolution": "nodenext",
     "module": "NodeNext"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/routes/graphql/mutations/unsubscribe-from.ts"]
 }
